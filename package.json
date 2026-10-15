@@ -6,21 +6,30 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "seed": "node --experimental-strip-types scripts/seed.ts",
+    "db:view": "node --experimental-strip-types scripts/view-db.ts",
+    "test": "cross-env VITE_CONFIG_NATIVE_IGNORE_WARNING=true vitest run",
+    "race": "node --experimental-strip-types scripts/race.ts",
+    "test:concurrency": "node --experimental-strip-types scripts/race.ts"
   },
   "dependencies": {
+    "@electric-sql/pglite": "^0.5.10",
     "next": "16.4.1",
     "react": "19.3.0",
     "react-dom": "19.3.0"
   },
   "devDependencies": {
     "@tailwindcss/turbopack": "^4",
-    "@types/node": "^20",
+    "@types/node": "^22",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "cross-env": "^10.1.0",
     "eslint": "^9",
     "eslint-config-next": "16.4.1",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vite": "^8.3.4",
+    "vitest": "^5.0.4"
   }
 }

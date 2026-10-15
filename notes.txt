@@ -1,0 +1,10 @@
+My notes: 
+I picked double booking because honestly its the most annoying bug in any reservation or rental app. most people just do a select query before insert to check if a slot is free but that always breaks when two people click at the same time. 
+so I decided to make postgres handle it at the database level with exclusion constraints and gist index so its impossible to double book even under heavy race conditions. cut out all the extra stuff like auth, payments, multi timezones and email notifications to keep it strictly under the 20 hour budget and focus on one thing that actually works end to end.
+
+I used claude models on google antigravity specifically for the core logic, writing the postgres queries, and setting up the exclusion constraints. made sure it used postgres half open intervals so if one booking ends at 11 and another starts at 11 they dont block each other, and steered it away from any ai fluff for slot suggestions so it just does a clean deterministic scan for the 3 nearest free slots. then switched over to gemini models to quickly knock out the frontend ui, handling the room selector tabs, and styling the components.
+
+hit a few bumps during development like dealing with pglite wasm file locks and stale pid files when restarting, so i ended up adding a quick cli inspector and dev endpoint just so i could easily view the raw tables and data while building. the rest of the focus went into getting the actual web app working smoothly end to end: the operator can pick a room, book a clean slot on the timeline, or cancel an existing reservation to immediately free up space.
+
+the main thing was nailing the collision flow where if you try booking over an existing reservation the app immediately blocks it, tells you exactly who is blocking the slot, and pops up the 3 nearest free alternatives so you can book one with a single click.
+Abdullah.

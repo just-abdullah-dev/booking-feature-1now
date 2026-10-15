@@ -1,0 +1,82 @@
+Booking Conflict Guard — 1Now Assignment Plan
+By Abdullah · Engineer/Developer assignment · 20-hour cap
+1. The problem
+Operators take bookings through more than one path: manual entry, phone, and different channels. When two bookings land on the same resource and overlapping time, they get a double-booking. It is caught late, usually by an angry guest, and costs money and trust.
+The operator needs the system to refuse a conflicting booking at the moment it is created, say why, and offer the nearest slots that do work.
+2. The one feature
+Double-booking guard. A booking cannot be saved if it overlaps an existing active booking on the same resource. When it is rejected, the operator sees which booking blocked it and gets suggested alternative slots.
+Happy path (this is the demo)
+1. Operator opens the bookings page and sees a resource (for example, "Room A") with existing bookings.
+2. Operator creates a booking in a free slot. It saves and appears on the timeline.
+3. Operator tries a booking that overlaps an existing one. It is rejected with a clear message naming the conflicting booking.
+4. The app shows the nearest free slots of the same duration. One click books one of them.
+5. Two requests for the same slot are fired at once. Exactly one succeeds and the other is rejected.
+Step 5 is the point of the project: the guard holds under concurrency, not just in the form.
+3. Scope
+In scope
+• A resource list (seeded, no admin UI) and a booking list per resource
+• Create booking form: resource, guest name, start, end
+• Overlap check enforced in the database, not only in app code
+• Conflict response naming the blocking booking
+• Alternative slot suggestions (deterministic, same duration, nearest first)
+• Cancel booking, which frees the slot
+• Tests for overlap edge cases and the concurrent-request case
+Cut, and stated honestly
+• Authentication and user accounts
+• Payments, payouts, fraud checks
+• Calendar or channel sync (iCal, OAuth)
+• Notifications and emails
+• Multi-timezone handling (one fixed timezone, stated in the README)
+• Recurring bookings, buffers, and pricing rules
+• Production deployment and infra; it runs locally with a seed script
+• UI polish beyond a clean, usable timeline
+4. Technical approach
+• Stack: Next.js (App Router), TypeScript, PostgreSQL, Prisma
+• Core guard: a Postgres exclusion constraint on (resource_id, tstzrange(start, end)) using btree_gist, applied only to active bookings. The database is the source of truth, so concurrent requests cannot both succeed.
+• Conflict handling: the API catches the constraint violation, looks up the blocking booking, and returns a structured error.
+• Suggestions: a plain function that scans the resource's bookings and returns the nearest gaps that fit the requested duration. No AI involved.
+• Half-open ranges: a booking ending at 11:00 does not conflict with one starting at 11:00.
+• Data model: Resource, Booking (resource, guest name, start, end, status).
+5. Three-minute demo script
+1. State the problem in one sentence (20s)
+2. Create a valid booking (20s)
+3. Attempt an overlapping booking and show the rejection (30s)
+4. Pick a suggested slot (20s)
+5. Run the concurrent-request test and show one pass, one fail (40s)
+6. Show scope cuts and how Claude Code was directed (50s)
+6. Working with Claude Code
+The assignment grades how I direct the agent, not whether it wrote code. This section sets the split in advance.
+What I expect Claude Code to do
+• Scaffold the Next.js project, Prisma schema, and seed script
+• Write the migration SQL for the exclusion constraint once I specify the rule
+• Implement the API route, form, and timeline UI from my spec
+• Write the slot-suggestion function and unit tests for overlap edge cases
+• Write the concurrency test
+• Debug errors and explain failures when I paste them
+• Draft the README structure from the facts I give it
+What I do not expect Claude Code to do
+• Choose the problem, the scope, or the cuts. Those are mine.
+• Decide the conflict rules (half-open ranges, which statuses count as active). I decide and state them.
+• Add features I did not ask for (auth, notifications, extra pages)
+• Move the overlap check out of the database into app code only
+• Use AI for the guard or the suggestions; both stay deterministic
+• Claim something works without running it
+• Write my journey notes or the demo narration
+• Merge or commit without me reading the diff
+Where the agent should stay (boundaries)
+• Inside the repo only. It works in this project folder and touches nothing outside it.
+• Allowed areas: app/, lib/, prisma/, tests/, and the README.
+• Off limits without my approval: dependency additions, database schema changes outside the planned model, environment files, git history rewrites, and deployment settings.
+• One task at a time. Each prompt is a small, reviewable step: schema, then constraint, then API, then UI, then suggestions, then tests.
+• Plan first. For each step it proposes a short plan, I approve or trim it, then it builds.
+• Verify before moving on. Each step ends with a test or a manual check that I run myself.
+How I will steer
+• Start each step with the problem and the rule, not the solution
+• Keep a running log of prompts, corrections, and dead ends for the journey notes
+• Cut scope when a step grows, and write down what was cut and why
+7. Submission checklist
+[ ] Public GitHub repo with README (setup, run, seed, test, scope cuts)
+[ ] Loom walkthrough, 3 minutes max, happy path working
+[ ] Journey notes: why this problem, where I got stuck, what I cut
+[ ] Concurrency test passing
+[ ] Stated assumptions: one timezone, half-open time ranges, seeded resources
