@@ -1,6 +1,7 @@
 My notes: 
 I picked double booking because honestly its the most annoying bug in any reservation or rental app. most people just do a select query before insert to check if a slot is free but that always breaks when two people click at the same time. 
-so I decided to make postgres handle it at the database level with exclusion constraints and gist index so its impossible to double book even under heavy race conditions. cut out all the extra stuff like auth, payments, multi timezones and email notifications to keep it strictly under the 20 hour budget and focus on one thing that actually works end to end.
+so I decided to make postgres handle it at the database level with exclusion constraints and gist index so its impossible to double book even under heavy race conditions. 
+cut out all the extra stuff like auth, payments, multi timezones and email notifications to keep it strictly under the 20 hour budget and focus on one thing that actually works end to end.
 
 I used claude models on google antigravity specifically for the core logic, writing the postgres queries, and setting up the exclusion constraints. made sure it used postgres half open intervals so if one booking ends at 11 and another starts at 11 they dont block each other, and steered it away from any ai fluff for slot suggestions so it just does a clean deterministic scan for the 3 nearest free slots. then switched over to gemini models to quickly knock out the frontend ui, handling the room selector tabs, and styling the components.
 
