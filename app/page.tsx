@@ -1,8 +1,6 @@
 import { initDb } from "@/lib/db";
 import { BookingsClient, Resource, Booking } from "./bookings-client";
 
-export const instant = false;
-
 export default async function BookingsPage() {
   const db = await initDb();
 
